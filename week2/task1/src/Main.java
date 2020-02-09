@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
@@ -8,32 +9,54 @@ public class Main {
         Scanner in = new Scanner(new File("input.txt"));
         FileWriter out = new FileWriter(new File("output.txt"));
 
-        int[] m = new int[1000];
+        ArrayList<Integer> array = new ArrayList<>();
         int n = in.nextInt();
 
         for (int i = 0; i < n; i++){
-            m[i] = in.nextInt();
+            array.add(in.nextInt());
         }
 
-        for (int i = 1; i < n; i++){
-            int j = i;
-            while ((j > 0) && (m[j-1] > m[j])){
-                int tmp = m[j-1];
-                m[j-1] = m[j];
-                m[j] = tmp;
-                out.write("Swap elements at indices " + i + " and " + j + "\n");
-                j--;
-            }
-        }
-        out.write("No more swaps needed\n");
+        merge(array, 0, n);
+
+
+
+
+
 
         for (int i = 0; i < n; i++){
-            out.write(m[i] + " ");
+            out.write(array.get(i) + " ");
         }
+
 
         in.close();
         out.flush();
         out.close();
 
+    }
+
+    // sort array from l-index to r-1 index
+    static void merge(ArrayList<Integer> array, int l, int r) {
+        if (r - l == 1) return;
+
+        merge(array, l, (l + r + 1) / 2);
+        merge(array, (l + r + 1) / 2, r);
+
+        ArrayList<Integer> mergedArray = new ArrayList<>();
+
+        int i = l;
+        int j = (l + r + 1) / 2;
+
+        while ((i < (l + r + 1) / 2) || (j < r)) {
+            if ((j == r) || ((i < (l + r + 1) / 2) && (array.get(i) <= array.get(j)))) {
+                mergedArray.add(array.get(i));
+                i++;
+            } else {
+                mergedArray.add(array.get(j));
+                j++;
+            }
+        }
+        for (i = l; i < r; i++) {
+            array.set(i, mergedArray.get(i - l));
+        }
     }
 }
