@@ -1,34 +1,22 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
-
-
     public static void main(String[] args) throws IOException {
         Scanner in = new Scanner(new File("input.txt"));
         FileWriter out = new FileWriter(new File("output.txt"));
+
         ArrayList<Integer> array = new ArrayList<>();
         int n = in.nextInt();
 
         for (int i = 0; i < n; i++){
             array.add(in.nextInt());
         }
-        Integer inversionCount = 0;
-        merge(array, 0, n, inversionCount);
-
-
-
-
-
-
-        for (int i = 0; i < n; i++){
-            out.write(array.get(i) + " ");
-        }
-
-
+        out.write(String.valueOf(getInversionCount(array,0, n)));
         in.close();
         out.flush();
         out.close();
@@ -36,13 +24,12 @@ public class Main {
     }
 
     // sort array from l-index to r-1 index
-    static void merge(ArrayList<Integer> array, int l, int r, int inversionCount) throws IOException {
-        if (r - l == 1) return;
+    static BigInteger getInversionCount(ArrayList<Integer> array, int l, int r) {
+        BigInteger inversionCount = new BigInteger("0");
+        if (r - l == 1) return inversionCount;
 
 
-        merge(array, l, (l + r + 1) / 2, inversionCount);
-        merge(array, (l + r + 1) / 2, r, inversionCount);
-
+        inversionCount = getInversionCount(array, l, (l + r + 1) / 2).add(getInversionCount(array, (l + r + 1) / 2, r));
 
         ArrayList<Integer> mergedArray = new ArrayList<>();
 
@@ -54,13 +41,14 @@ public class Main {
                 mergedArray.add(array.get(i));
                 i++;
             } else {
+                inversionCount = inversionCount.add(BigInteger.valueOf((l+r+1)/2-i));
                 mergedArray.add(array.get(j));
                 j++;
-
             }
         }
         for (i = l; i < r; i++) {
             array.set(i, mergedArray.get(i - l));
         }
+        return inversionCount;
     }
 }
