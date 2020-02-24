@@ -5,7 +5,9 @@ import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -17,47 +19,41 @@ public class Main {
 
         ArrayList<Integer> mArray = new ArrayList<>();
         ArrayList<Integer> nArray = new ArrayList<>();
-        byte[] cArray = new byte[1600000000];
+        ArrayList<Integer> array = new ArrayList<>();
+
         int n = in.nextInt();
         int m = in.nextInt();
 
-
-        for (int i = 0; i <= 1600000000; i++){
-            cArray[i] = 0;
-        }
         for (int i = 0; i < n; i++){
             nArray.add(in.nextInt());
         }
+        Collections.sort(nArray);
 
         for (int i = 0; i < m; i++){
             mArray.add(in.nextInt());
         }
+        Collections.sort(mArray);
+
+
+
 
 
         for (Integer elem1: nArray){
+            ArrayList<Integer> rightArray = new ArrayList<>();
             for (Integer elem2: mArray){
-                cArray[elem1*elem2]++;
+                rightArray.add(elem1*elem2);
             }
-        }
-
-        for (int i = 1; i <= 40000; i++){
-            cArray[i] += cArray[i-1];
+            array = merge(array, rightArray);
         }
 
 
         BigInteger sum = new BigInteger("0");
 
-        for (Integer elem1: nArray){
-            for (Integer elem2: mArray){
-                if ((cArray[elem1*elem2])%10==1){
-                    sum = sum.add(BigInteger.valueOf(elem1*elem2));
-                }
-                cArray[elem1*elem2]--;
-            }
+        for (int i = 0; i < array.size(); i+=10){
+            sum = sum.add(BigInteger.valueOf(array.get(i)));
         }
-
-
         out.write(String.valueOf(sum));
+
 
         in.close();
         out.flush();
@@ -65,6 +61,23 @@ public class Main {
 
     }
 
+    static ArrayList<Integer> merge(ArrayList<Integer> leftArray, ArrayList<Integer> rightArray) throws IOException {
 
+        int i = 0;
+        int j = 0;
+
+        ArrayList<Integer> array = new ArrayList<>();
+
+        while ((i < leftArray.size()) || (j < rightArray.size())) {
+            if ((j == rightArray.size()) || ((i < leftArray.size()) && (leftArray.get(i) <= rightArray.get(j)))) {
+                array.add(leftArray.get(i));
+                i++;
+            } else {
+                array.add(rightArray.get(j));
+                j++;
+            }
+        }
+        return array;
+    }
 }
 
