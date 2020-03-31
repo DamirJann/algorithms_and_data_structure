@@ -11,9 +11,9 @@ using namespace std;
 
 class cheap{
 private:
-    int lines[100009];
-    int location[100009];
-    int array[100009];
+    int* lines = new int[1000000];
+    int* location = new int[1000000];
+    int* array = new int[1000000];
     int size = 0;
 
     int getLeftChild(const int& i) const;
@@ -37,6 +37,8 @@ int main() {
     cheap chp;
 
     in >> n;
+
+
 
     for (int i = 2; i < n+2; i++){
         string str;
@@ -83,7 +85,7 @@ int cheap::getRightChild(const int& i) const{
     return (i+1)*2 >= size ? i : (i+1)*2;
 }
 
-pint cheap::getParent(const int& i) const{
+int cheap::getParent(const int& i) const{
     return i == 0 ? 0 : (i-1)/2;
 }
 
@@ -92,8 +94,8 @@ string cheap::extractMin(){
     if (size == 0) return "*";
     int min = array[0];
     array[0] = array[size-1];
-    location[0] = lines[size-1];
-    lines[size-1] = 0;
+    location[0] = location[size-1];
+    lines[location[0]] = 0;
     size--;
     siftDown(0);
     return to_string(min);
@@ -110,17 +112,12 @@ void cheap::insert(const int& lineInd, const int& x){
 
 void cheap::replace(const int& x, const int& y){
     int index = lines[x];
-
     array[index] = y;
-
-
-
     siftUp(index);
-
 }
 
 void cheap::siftUp(int i){
-    while ((getParent(i) != i) && (array[i] < array[getParent(i)])){
+    while ((i != 0) && (array[i] < array[getParent(i)])){
 
         swap(array[i], array[getParent(i)]);
         swap(lines[location[i]], lines[location[getParent(i)]]);
@@ -130,17 +127,17 @@ void cheap::siftUp(int i){
 }
 
 void cheap::siftDown(int i) {
-    while (getLeftChild(i) != i) {
+    while ((getLeftChild(i) != i) || (getRightChild(i) != i)) {
         int indOfMin = array[getLeftChild(i)] < array[getRightChild(i)] ? getLeftChild(i) : getRightChild(i);
         if (array[i] > array[indOfMin]) {
             swap(array[i], array[indOfMin]);
             swap(lines[location[i]], lines[location[indOfMin]]);
             swap(location[i], location[indOfMin]);
             i = indOfMin;
-        } else {
+        }
+        else{
             break;
         }
-
     }
 }
 
