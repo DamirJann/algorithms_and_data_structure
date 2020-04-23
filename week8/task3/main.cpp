@@ -7,21 +7,15 @@ class set{
 private:
     int HASH_COUNT;
 public:
-    struct node{
-        node(long long int key);
-        long long int key;
-        long long int value;
-        node* pNextNode;
-        bool isEqual(long long int key);
-    };
+    int count = 0;
+public:
+    long long int key;
 private:
-    node** hashArray = new node*[10'000'000];
+    long long int* hashArray = new long long int[20'000'000];
 public:
     set();
-    int hashCode(long long int key);
-    void insert(long long int key);
-    bool find(long long int key);
-    void erase(long long int key);
+    bool insert(long long int key);
+    long long int h(long long int key, long long int i);
 };
 
 using namespace std;
@@ -35,12 +29,11 @@ int main() {
     in >> N >> X >> A >> B >> AC >> BC >> AD >> BD;
 
     for (long long int i = 0; i < N; i++){
-        if (numbers.find(X)){
+        if (!numbers.insert(X)){
             A = (A+AC) % 1000;
             B = (B+BC) % 1000000000000000;
         }
         else{
-            numbers.insert(X);
             A = (A+AD) % 1000;
             B = (B+BD) % 1000000000000000;
         }
@@ -48,71 +41,40 @@ int main() {
     }
 
     out << X << ' ' << A << ' ' << B;
-
+    cout << numbers.count;
     in.close();
     out.close();
 
     return 0;
 }
 
-set::set(): HASH_COUNT(10'000'000){
-    for (node** p = hashArray; p < hashArray+HASH_COUNT; p++){
-        *p = nullptr;
+set::set(): HASH_COUNT(20'000'000){
+    for (long long int* p = hashArray; p < hashArray+HASH_COUNT; p++){
+        *p = -1;
     }
 }
 
-set::node::node(long long int key): key(key), pNextNode(nullptr){}
 
-bool set::node::isEqual(long long int key){
-    return this->key == key;
-}
+bool set::insert(long long int key){
+    bool isInserted = false;
 
-int set::hashCode(long long int key){
-    return abs(key) % HASH_COUNT;
-}
+    for (long long int i = 0; (i < HASH_COUNT) && (!isInserted); i++){
+        int j = (key%HASH_COUNT+key/HASH_COUNT+i) % HASH_COUNT;
+        if (hashArray[j] == -1){
+            hashArray[j] = key;
+            isInserted = true;
+           count++;
+           if (count % 10000 == 0) cout << count << endl;
 
-void set::insert(long long int key){
-    int index = hashCode(key);
-    node* p = hashArray[index];
-
-    if (p == nullptr){
-        hashArray[index] = new node(key);
-    }
-    else if (!find(key)){
-        hashArray[index] = new node(key);
-        hashArray[index]->pNextNode = p;
-    }
-}
-
-bool set::find(long long int key){
-    node* pCurrentNode = hashArray[hashCode(key)];
-    while (pCurrentNode != nullptr){
-        if (pCurrentNode->isEqual(key)){
-            return true;
         }
-        pCurrentNode = pCurrentNode->pNextNode;
-    }
-    return false;
-}
-
-void set::erase(long long int key){
-    node* pPreviousNode = hashArray[hashCode(key)];
-
-    if (pPreviousNode != nullptr) {
-        // deleted node is head
-        if (pPreviousNode->isEqual(key)) {
-            hashArray[hashCode(key)] = pPreviousNode->pNextNode;
-            delete pPreviousNode;
-        } else {
-            node *pCurrentNode = pPreviousNode->pNextNode;
-            while (pCurrentNode != nullptr) {
-                if (pCurrentNode->isEqual(key)) {
-                    pPreviousNode->pNextNode = pCurrentNode->pNextNode;
-                    delete pCurrentNode;
-                }
-                pPreviousNode = pCurrentNode;
-                pCurrentNode = pCurrentNode->pNextNode;
-            }
+        else if (hashArray[j] == key){
+            break;
         }
     }
+    return isInserted;
+}
+
+
+long long int set::h(long long int key, long long int i){
+    return (key%HASH_COUNT+key/HASH_COUNT+i) % HASH_COUNT;
 }
